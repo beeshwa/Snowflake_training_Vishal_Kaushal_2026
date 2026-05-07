@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Training Course</title>
+  <style>
+    body { font-family: Arial; display: flex; }
+    #playlist { width: 30%; padding: 10px; }
+    #player { width: 70%; }
+    video { width: 100%; }
+    li { cursor: pointer; margin: 10px 0; }
+  </style>
+</head>
+
+<body>
+
+<div id="playlist">
+  <h3>Course Videos</h3>
+  <ul>
+    <li onclick="loadVideo('video1')">Video 1</li>
+    <li onclick="loadVideo('video2')">Video 2</li>
+  </ul>
+</div>
+
+<div id="player">
+  <video id="videoPlayer" controls></video>
+</div>
+
+<script>
+const videos = {
+  video1: "YOUR_VIDEO_URL_1",
+  video2: "YOUR_VIDEO_URL_2"
+};
+
+const player = document.getElementById("videoPlayer");
+
+function loadVideo(id) {
+  player.src = videos[id];
+
+  // Resume from last time
+  let savedTime = localStorage.getItem(id);
+  player.currentTime = savedTime ? savedTime : 0;
+
+  player.play();
+
+  // Save progress
+  player.ontimeupdate = () => {
+    localStorage.setItem(id, player.currentTime);
+  };
+}
+</script>
+
+</body>
+</html>
