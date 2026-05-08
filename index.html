@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2436;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --accent: #3ecf8e;
+    --accent-dim: rgba(62,207,142,0.12);
+    --accent-dim2: rgba(62,207,142,0.2);
+    --text: #f0f2f7;
+    --text2: #8b92a8;
+    --text3: #555d74;
+    --danger: #f87171;
+    --warn: #fbbf24;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+  /* SETUP SCREEN */
+  #setup-screen {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem;
+  }
+  .setup-box {
+    width: 100%; max-width: 520px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    padding: 2.5rem;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 2rem;
+  }
+  .logo-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--accent); display: flex; align-items: center; justify-content: center;
+  }
+  .logo-icon svg { width: 18px; height: 18px; fill: #0f1117; }
+  .logo-text { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+  .setup-box h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .setup-box p { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 2rem; }
+  .field-label { font-size: 12px; font-weight: 500; color: var(--text2); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+  .field-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+  .field-row input {
+    flex: 1; background: var(--bg); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 10px 14px; color: var(--text);
+    font-family: 'DM Mono', monospace; font-size: 13px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .field-row input:focus { border-color: var(--accent); }
+  .field-row input::placeholder { color: var(--text3); }
+  .btn-add {
+    background: var(--accent-dim); border: 1px solid var(--accent);
+    color: var(--accent); border-radius: 10px; padding: 10px 16px;
+    font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .btn-add:hover { background: var(--accent-dim2); }
+  .video-entries { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem; max-height: 220px; overflow-y: auto; }
+  .video-entry {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 10px;
+  }
+  .entry-num {
+    width: 22px; height: 22px; border-radius: 6px;
+    background: var(--accent-dim); color: var(--accent);
+    font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .entry-title { flex: 1; font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .entry-remove {
+    background: none; border: none; color: var(--text3); cursor: pointer;
+    font-size: 16px; line-height: 1; padding: 2px 4px;
+    transition: color 0.2s;
+  }
+  .entry-remove:hover { color: var(--danger); }
+  .btn-launch {
+    width: 100%; padding: 13px; border-radius: 12px;
+    background: var(--accent); color: #0f1117;
+    border: none; font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .btn-launch:hover { opacity: 0.9; }
+  .btn-launch:active { transform: scale(0.99); }
+  .btn-launch:disabled { opacity: 0.4; cursor: not-allowed; }
+  .hint { font-size: 12px; color: var(--text3); margin-top: 1rem; line-height: 1.5; }
+  .hint a { color: var(--accent); text-decoration: none; }
+
+  /* PLAYER SCREEN */
+  #player-screen { display: none; height: 100vh; flex-direction: column; }
+  .topbar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .topbar-logo { display: flex; align-items: center; gap: 8px; }
+  .topbar-logo .logo-icon { width: 28px; height: 28px; border-radius: 8px; }
+  .topbar-logo .logo-icon svg { width: 14px; height: 14px; }
+  .topbar-title { font-size: 14px; font-weight: 600; }
+  .topbar-sep { width: 1px; height: 18px; background: var(--border2); margin: 0 4px; }
+  .topbar-course { font-size: 13px; color: var(--text2); }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .overall-badge {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--accent-dim); border: 1px solid rgba(62,207,142,0.3);
+    border-radius: 20px; padding: 4px 12px;
+  }
+  .overall-badge span { font-size: 12px; color: var(--accent); font-weight: 500; }
+  .btn-reset {
+    background: none; border: 1px solid var(--border2);
+    color: var(--text2); border-radius: 8px; padding: 5px 10px;
+    font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-reset:hover { border-color: var(--danger); color: var(--danger); }
+
+  .main-layout { display: flex; flex: 1; overflow: hidden; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 300px; flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); }
+  .sidebar-header h3 { font-size: 12px; font-weight: 500; color: var(--text2); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .overall-bar-track { height: 4px; background: var(--border2); border-radius: 2px; overflow: hidden; }
+  .overall-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
+  .overall-stats { display: flex; justify-content: space-between; margin-top: 6px; }
+  .overall-stats span { font-size: 11px; color: var(--text3); }
+
+  .video-list { flex: 1; overflow-y: auto; padding: 8px; }
+  .video-list::-webkit-scrollbar { width: 4px; }
+  .video-list::-webkit-scrollbar-track { background: transparent; }
+  .video-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  .vitem {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 10px;
+    border-radius: 10px; cursor: pointer;
+    transition: background 0.15s;
+    border: 1px solid transparent;
+    margin-bottom: 2px;
+  }
+  .vitem:hover { background: var(--surface2); }
+  .vitem.active { background: var(--surface2); border-color: var(--accent-dim2); }
+  .vitem-num {
+    width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500;
+    background: var(--bg); color: var(--text2);
+    border: 1px solid var(--border2);
+  }
+  .vitem.completed .vitem-num { background: var(--accent-dim); color: var(--accent); border-color: rgba(62,207,142,0.3); }
+  .vitem.active .vitem-num { background: var(--accent); color: #0f1117; border-color: transparent; }
+  .vitem-info { flex: 1; min-width: 0; }
+  .vitem-title { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vitem.active .vitem-title { color: var(--accent); }
+  .vitem-sub { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+  .vitem-pct { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
+  .vitem-mini-bar { flex: 1; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
+  .vitem-mini-fill { height: 100%; background: var(--accent); border-radius: 1px; }
+  .vitem-check { font-size: 14px; color: var(--accent); flex-shrink: 0; }
+
+  /* PLAYER */
+  .player-area {
+    flex: 1; display: flex; flex-direction: column;
+    overflow: hidden; background: var(--bg);
+  }
+  .video-container {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    background: #000; position: relative;
+  }
+  .video-container iframe { width: 100%; height: 100%; border: none; display: block; }
+  .no-video-msg {
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    color: var(--text3);
+  }
+  .no-video-msg svg { width: 52px; height: 52px; opacity: 0.3; }
+  .no-video-msg p { font-size: 14px; }
+
+  .player-footer {
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 14px 20px; flex-shrink: 0;
+  }
+  .now-playing-label { font-size: 11px; color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 4px; }
+  .now-playing-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .progress-row { display: flex; align-items: center; gap: 12px; }
+  .progress-track {
+    flex: 1; height: 6px; background: var(--border2);
+    border-radius: 3px; overflow: hidden; cursor: pointer;
+  }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.5s ease; pointer-events: none; }
+  .progress-pct { font-size: 12px; font-weight: 500; color: var(--accent); font-family: 'DM Mono', monospace; min-width: 38px; text-align: right; }
+  .nav-btns { display: flex; gap: 8px; margin-top: 12px; }
+  .nav-btn {
+    background: var(--surface2); border: 1px solid var(--border2);
+    color: var(--text2); border-radius: 8px; padding: 7px 14px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .mark-btn {
+    margin-left: auto;
+    background: var(--accent-dim); border: 1px solid rgba(62,207,142,0.3);
+    color: var(--accent); border-radius: 8px; padding: 7px 14px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .mark-btn:hover { background: var(--accent-dim2); }
+  .mark-btn.done { background: var(--accent); color: #0f1117; border-color: transparent; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--surface); border: 1px solid var(--border2); color: var(--text);
+    padding: 10px 20px; border-radius: 100px; font-size: 13px; font-weight: 500;
+    transition: transform 0.3s ease; z-index: 999; white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+  <div class="setup-box">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+      <span class="logo-text">Training Portal</span>
+    </div>
+    <h1>Set up your course</h1>
+    <p>Add your training videos from Google Drive. Paste each video's shareable link and give it a title.</p>
+
+    <div class="field-label">Course name</div>
+    <div class="field-row" style="margin-bottom:1.5rem">
+      <input type="text" id="course-name" placeholder="e.g. Onboarding Training 2025" style="font-family:'DM Sans',sans-serif">
+    </div>
+
+    <div class="field-label">Add videos</div>
+    <div class="field-row">
+      <input type="text" id="video-title-input" placeholder="Video title">
+    </div>
+    <div class="field-row">
+      <input type="text" id="video-url-input" placeholder="Google Drive share link (drive.google.com/...)">
+      <button class="btn-add" onclick="addVideo()">+ Add</button>
+    </div>
+
+    <div class="video-entries" id="video-entries"></div>
+
+    <button class="btn-launch" id="launch-btn" onclick="launchPlayer()" disabled>Launch Player →</button>
+
+    <p class="hint">
+      To get a Google Drive link: right-click the video → Share → Copy link. Make sure sharing is set to "Anyone with the link".<br><br>
+      Your progress is saved automatically in your browser — it will be there next time you open this page.
+    </p>
+  </div>
+</div>
+
+<!-- PLAYER SCREEN -->
+<div id="player-screen">
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="#0f1117"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+    </div>
+    <span class="topbar-title">Training Portal</span>
+    <div class="topbar-sep"></div>
+    <span class="topbar-course" id="topbar-course-name"></span>
+    <div class="topbar-right">
+      <div class="overall-badge">
+        <span id="topbar-pct">0% complete</span>
+      </div>
+      <button class="btn-reset" onclick="resetProgress()">Reset progress</button>
+      <button class="btn-reset" onclick="goToSetup()">Edit videos</button>
+    </div>
+  </div>
+
+  <div class="main-layout">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h3>Course progress</h3>
+        <div class="overall-bar-track">
+          <div class="overall-bar-fill" id="overall-bar" style="width:0%"></div>
+        </div>
+        <div class="overall-stats">
+          <span id="stat-watched">0 watched</span>
+          <span id="stat-total">0 videos</span>
+        </div>
+      </div>
+      <div class="video-list" id="video-list"></div>
+    </div>
+
+    <div class="player-area">
+      <div class="video-container" id="video-container">
+        <div class="no-video-msg" id="no-video-msg">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <p>Select a video to start watching</p>
+        </div>
+        <iframe id="video-iframe" style="display:none" allowfullscreen allow="autoplay"></iframe>
+      </div>
+
+      <div class="player-footer">
+        <div class="now-playing-label">Now playing</div>
+        <div class="now-playing-title" id="now-playing-title">—</div>
+        <div class="progress-row">
+          <div class="progress-track" id="progress-track">
+            <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+          </div>
+          <div class="progress-pct" id="progress-pct">0%</div>
+        </div>
+        <div class="nav-btns">
+          <button class="nav-btn" id="btn-prev" onclick="prevVideo()">← Previous</button>
+          <button class="nav-btn" id="btn-next" onclick="nextVideo()">Next →</button>
+          <button class="mark-btn" id="mark-btn" onclick="toggleComplete()">Mark as complete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const STORAGE_KEY = 'training_portal_v1';
+  let state = {
+    courseName: '',
+    videos: [],
+    progress: {},
+    currentIndex: -1
+  };
+
+  function loadState() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        state = { ...state, ...parsed };
+        return true;
+      }
+    } catch(e) {}
+    return false;
+  }
+
+  function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function getDriveEmbedUrl(url) {
+    // Handle various Google Drive URL formats
+    let fileId = null;
+    const patterns = [
+      /\/file\/d\/([a-zA-Z0-9_-]+)/,
+      /id=([a-zA-Z0-9_-]+)/,
+      /\/d\/([a-zA-Z0-9_-]+)/
+    ];
+    for (const p of patterns) {
+      const m = url.match(p);
+      if (m) { fileId = m[1]; break; }
+    }
+    if (!fileId) return url;
+    return `https://drive.google.com/file/d/${fileId}/preview`;
+  }
+
+  // ── SETUP ──────────────────────────────────────────────────
+  let tempVideos = [];
+
+  function addVideo() {
+    const titleEl = document.getElementById('video-title-input');
+    const urlEl = document.getElementById('video-url-input');
+    const title = titleEl.value.trim();
+    const url = urlEl.value.trim();
+    if (!title || !url) { showToast('Please enter both a title and a URL'); return; }
+    tempVideos.push({ id: Date.now().toString(), title, url });
+    titleEl.value = ''; urlEl.value = '';
+    titleEl.focus();
+    renderEntries();
+  }
+
+  document.getElementById('video-url-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addVideo();
+  });
+  document.getElementById('video-title-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('video-url-input').focus();
+  });
+
+  function removeEntry(id) {
+    tempVideos = tempVideos.filter(v => v.id !== id);
+    renderEntries();
+  }
+
+  function renderEntries() {
+    const container = document.getElementById('video-entries');
+    container.innerHTML = tempVideos.map((v, i) => `
+      <div class="video-entry">
+        <div class="entry-num">${i + 1}</div>
+        <div class="entry-title" title="${v.title}">${v.title}</div>
+        <button class="entry-remove" onclick="removeEntry('${v.id}')" title="Remove">×</button>
+      </div>
+    `).join('');
+    document.getElementById('launch-btn').disabled = tempVideos.length === 0;
+  }
+
+  function launchPlayer() {
+    const name = document.getElementById('course-name').value.trim() || 'My Training Course';
+    state.courseName = name;
+    state.videos = tempVideos;
+    if (state.currentIndex >= state.videos.length) state.currentIndex = -1;
+    saveState();
+    showPlayer();
+  }
+
+  function goToSetup() {
+    tempVideos = [...state.videos];
+    document.getElementById('course-name').value = state.courseName;
+    renderEntries();
+    document.getElementById('setup-screen').style.display = 'flex';
+    document.getElementById('player-screen').style.display = 'none';
+  }
+
+  // ── PLAYER ──────────────────────────────────────────────────
+  function showPlayer() {
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('player-screen').style.display = 'flex';
+    document.getElementById('topbar-course-name').textContent = state.courseName;
+    renderVideoList();
+    updateOverallProgress();
+    if (state.currentIndex >= 0 && state.currentIndex < state.videos.length) {
+      selectVideo(state.currentIndex, false);
+    }
+  }
+
+  function renderVideoList() {
+    const list = document.getElementById('video-list');
+    list.innerHTML = state.videos.map((v, i) => {
+      const prog = state.progress[v.id] || { pct: 0, completed: false };
+      const pct = Math.round(prog.pct || 0);
+      const isActive = i === state.currentIndex;
+      const isDone = prog.completed;
+      return `
+        <div class="vitem ${isActive ? 'active' : ''} ${isDone ? 'completed' : ''}" onclick="selectVideo(${i}, true)">
+          <div class="vitem-num">${isDone && !isActive ? '✓' : i + 1}</div>
+          <div class="vitem-info">
+            <div class="vitem-title">${v.title}</div>
+            <div class="vitem-sub">
+              <span class="vitem-pct">${pct}%</span>
+              <div class="vitem-mini-bar"><div class="vitem-mini-fill" style="width:${pct}%"></div></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function selectVideo(index, saveProgress) {
+    state.currentIndex = index;
+    const video = state.videos[index];
+    const prog = state.progress[video.id] || { pct: 0, completed: false };
+
+    document.getElementById('no-video-msg').style.display = 'none';
+    const iframe = document.getElementById('video-iframe');
+    iframe.style.display = 'block';
+    iframe.src = getDriveEmbedUrl(video.url);
+
+    document.getElementById('now-playing-title').textContent = video.title;
+    updateProgressUI(prog.pct || 0, prog.completed);
+    renderVideoList();
+    saveState();
+
+    document.getElementById('btn-prev').disabled = index === 0;
+    document.getElementById('btn-next').disabled = index === state.videos.length - 1;
+
+    // Scroll active item into view
+    const listEl = document.getElementById('video-list');
+    const activeEl = listEl.querySelectorAll('.vitem')[index];
+    if (activeEl) activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
+  function updateProgressUI(pct, completed) {
+    const p = Math.round(pct);
+    document.getElementById('progress-fill').style.width = p + '%';
+    document.getElementById('progress-pct').textContent = p + '%';
+    const btn = document.getElementById('mark-btn');
+    if (completed) {
+      btn.textContent = '✓ Completed';
+      btn.classList.add('done');
+    } else {
+      btn.textContent = 'Mark as complete';
+      btn.classList.remove('done');
+    }
+  }
+
+  function updateOverallProgress() {
+    const total = state.videos.length;
+    if (total === 0) return;
+    const completed = state.videos.filter(v => (state.progress[v.id] || {}).completed).length;
+    const avgPct = state.videos.reduce((sum, v) => sum + ((state.progress[v.id] || {}).pct || 0), 0) / total;
+    const overallPct = Math.round(avgPct);
+    document.getElementById('overall-bar').style.width = overallPct + '%';
+    document.getElementById('topbar-pct').textContent = overallPct + '% complete';
+    document.getElementById('stat-watched').textContent = `${completed} completed`;
+    document.getElementById('stat-total').textContent = `${total} videos`;
+  }
+
+  function toggleComplete() {
+    if (state.currentIndex < 0) return;
+    const video = state.videos[state.currentIndex];
+    if (!state.progress[video.id]) state.progress[video.id] = { pct: 0, completed: false };
+    const prog = state.progress[video.id];
+    prog.completed = !prog.completed;
+    if (prog.completed) prog.pct = 100;
+    saveState();
+    updateProgressUI(prog.pct, prog.completed);
+    updateOverallProgress();
+    renderVideoList();
+    showToast(prog.completed ? '✓ Marked as complete!' : 'Marked as incomplete');
+  }
+
+  function prevVideo() {
+    if (state.currentIndex > 0) selectVideo(state.currentIndex - 1, true);
+  }
+
+  function nextVideo() {
+    if (state.currentIndex < state.videos.length - 1) selectVideo(state.currentIndex + 1, true);
+  }
+
+  // Manual progress slider via track click
+  document.getElementById('progress-track').addEventListener('click', function(e) {
+    if (state.currentIndex < 0) return;
+    const rect = this.getBoundingClientRect();
+    const pct = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+    const video = state.videos[state.currentIndex];
+    if (!state.progress[video.id]) state.progress[video.id] = { pct: 0, completed: false };
+    state.progress[video.id].pct = pct;
+    if (pct >= 90) state.progress[video.id].completed = true;
+    saveState();
+    updateProgressUI(state.progress[video.id].pct, state.progress[video.id].completed);
+    updateOverallProgress();
+    renderVideoList();
+  });
+
+  // Auto-save progress every 30s (increment slowly to simulate watching)
+  setInterval(() => {
+    if (state.currentIndex < 0) return;
+    const iframe = document.getElementById('video-iframe');
+    if (iframe.style.display === 'none') return;
+    const video = state.videos[state.currentIndex];
+    if (!state.progress[video.id]) state.progress[video.id] = { pct: 0, completed: false };
+    const prog = state.progress[video.id];
+    if (!prog.completed && prog.pct < 95) {
+      prog.pct = Math.min(95, (prog.pct || 0) + 2);
+      saveState();
+      updateProgressUI(prog.pct, prog.completed);
+      updateOverallProgress();
+      renderVideoList();
+    }
+  }, 30000);
+
+  function resetProgress() {
+    if (!confirm('Reset all progress? This cannot be undone.')) return;
+    state.progress = {};
+    state.currentIndex = -1;
+    document.getElementById('video-iframe').style.display = 'none';
+    document.getElementById('no-video-msg').style.display = 'flex';
+    document.getElementById('now-playing-title').textContent = '—';
+    updateProgressUI(0, false);
+    saveState();
+    renderVideoList();
+    updateOverallProgress();
+    showToast('Progress reset');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // ── INIT ──────────────────────────────────────────────────
+  window.addEventListener('load', () => {
+    const hasSaved = loadState();
+    if (hasSaved && state.videos && state.videos.length > 0) {
+      tempVideos = [...state.videos];
+      showPlayer();
+    } else {
+      document.getElementById('setup-screen').style.display = 'flex';
+    }
+  });
+</script>
+</body>
+</html>
