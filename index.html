@@ -3,342 +3,384 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Training Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Snowflake Training Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Instrument+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0f1117;
-    --surface: #181c27;
-    --surface2: #1e2436;
-    --border: rgba(255,255,255,0.07);
-    --border2: rgba(255,255,255,0.12);
-    --accent: #3ecf8e;
-    --accent-dim: rgba(62,207,142,0.12);
-    --accent-dim2: rgba(62,207,142,0.2);
-    --text: #f0f2f7;
-    --text2: #8b92a8;
-    --text3: #555d74;
-    --danger: #f87171;
-    --warn: #fbbf24;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+:root {
+  --bg: #080c14;
+  --surface: #0e1420;
+  --surface2: #141b2d;
+  --surface3: #1a2238;
+  --border: rgba(99,179,237,0.08);
+  --border2: rgba(99,179,237,0.15);
+  --accent: #63b3ed;
+  --accent2: #4299e1;
+  --accent-glow: rgba(99,179,237,0.15);
+  --green: #68d391;
+  --green-dim: rgba(104,211,145,0.12);
+  --red: #fc8181;
+  --yellow: #f6e05e;
+  --text: #e2e8f5;
+  --text2: #7a8aaa;
+  --text3: #3d4d6a;
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'Instrument Sans', sans-serif;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: var(--font-body); background: var(--bg); color: var(--text); overflow: hidden; }
 
-  /* SETUP SCREEN */
-  #setup-screen {
-    min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    padding: 2rem;
-  }
-  .setup-box {
-    width: 100%; max-width: 520px;
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: 20px;
-    padding: 2.5rem;
-  }
-  .logo {
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 2rem;
-  }
-  .logo-icon {
-    width: 36px; height: 36px; border-radius: 10px;
-    background: var(--accent); display: flex; align-items: center; justify-content: center;
-  }
-  .logo-icon svg { width: 18px; height: 18px; fill: #0f1117; }
-  .logo-text { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
-  .setup-box h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 8px; }
-  .setup-box p { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 2rem; }
-  .field-label { font-size: 12px; font-weight: 500; color: var(--text2); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
-  .field-row { display: flex; gap: 8px; margin-bottom: 1rem; }
-  .field-row input {
-    flex: 1; background: var(--bg); border: 1px solid var(--border2);
-    border-radius: 10px; padding: 10px 14px; color: var(--text);
-    font-family: 'DM Mono', monospace; font-size: 13px; outline: none;
-    transition: border-color 0.2s;
-  }
-  .field-row input:focus { border-color: var(--accent); }
-  .field-row input::placeholder { color: var(--text3); }
-  .btn-add {
-    background: var(--accent-dim); border: 1px solid var(--accent);
-    color: var(--accent); border-radius: 10px; padding: 10px 16px;
-    font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;
-    transition: background 0.2s;
-  }
-  .btn-add:hover { background: var(--accent-dim2); }
-  .video-entries { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem; max-height: 220px; overflow-y: auto; }
-  .video-entry {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: 8px; padding: 8px 10px;
-  }
-  .entry-num {
-    width: 22px; height: 22px; border-radius: 6px;
-    background: var(--accent-dim); color: var(--accent);
-    font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .entry-title { flex: 1; font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .entry-remove {
-    background: none; border: none; color: var(--text3); cursor: pointer;
-    font-size: 16px; line-height: 1; padding: 2px 4px;
-    transition: color 0.2s;
-  }
-  .entry-remove:hover { color: var(--danger); }
-  .btn-launch {
-    width: 100%; padding: 13px; border-radius: 12px;
-    background: var(--accent); color: #0f1117;
-    border: none; font-family: 'DM Sans', sans-serif;
-    font-size: 15px; font-weight: 600; cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
-  }
-  .btn-launch:hover { opacity: 0.9; }
-  .btn-launch:active { transform: scale(0.99); }
-  .btn-launch:disabled { opacity: 0.4; cursor: not-allowed; }
-  .hint { font-size: 12px; color: var(--text3); margin-top: 1rem; line-height: 1.5; }
-  .hint a { color: var(--accent); text-decoration: none; }
+/* ── LAYOUT ── */
+.app { display: flex; height: 100vh; position: relative; z-index: 1; }
 
-  /* PLAYER SCREEN */
-  #player-screen { display: none; height: 100vh; flex-direction: column; }
-  .topbar {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 20px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .topbar-logo { display: flex; align-items: center; gap: 8px; }
-  .topbar-logo .logo-icon { width: 28px; height: 28px; border-radius: 8px; }
-  .topbar-logo .logo-icon svg { width: 14px; height: 14px; }
-  .topbar-title { font-size: 14px; font-weight: 600; }
-  .topbar-sep { width: 1px; height: 18px; background: var(--border2); margin: 0 4px; }
-  .topbar-course { font-size: 13px; color: var(--text2); }
-  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
-  .overall-badge {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--accent-dim); border: 1px solid rgba(62,207,142,0.3);
-    border-radius: 20px; padding: 4px 12px;
-  }
-  .overall-badge span { font-size: 12px; color: var(--accent); font-weight: 500; }
-  .btn-reset {
-    background: none; border: 1px solid var(--border2);
-    color: var(--text2); border-radius: 8px; padding: 5px 10px;
-    font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif;
-    transition: all 0.2s;
-  }
-  .btn-reset:hover { border-color: var(--danger); color: var(--danger); }
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 310px; flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.sidebar-top {
+  padding: 18px 14px 12px;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.brand { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.brand-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent2), #2b6cb0);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 14px rgba(99,179,237,0.3); flex-shrink: 0;
+}
+.brand-icon svg { width: 15px; height: 15px; fill: white; }
+.brand-name { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--text); }
+.brand-sub { font-size: 10px; color: var(--text2); margin-top: 1px; }
 
-  .main-layout { display: flex; flex: 1; overflow: hidden; }
+.overall-box {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 9px 11px;
+}
+.op-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+.op-label { font-size: 10px; color: var(--text2); font-weight: 500; letter-spacing: 0.4px; text-transform: uppercase; }
+.op-pct { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--accent); }
+.prog-track { height: 4px; background: var(--border2); border-radius: 2px; overflow: hidden; }
+.prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--green)); border-radius: 2px; transition: width 0.5s ease; }
+.op-stats { display: flex; gap: 10px; margin-top: 5px; }
+.op-stat { font-size: 10px; color: var(--text3); }
+.op-stat span { color: var(--text2); font-weight: 500; }
 
-  /* SIDEBAR */
-  .sidebar {
-    width: 300px; flex-shrink: 0;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex; flex-direction: column;
-    overflow: hidden;
-  }
-  .sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); }
-  .sidebar-header h3 { font-size: 12px; font-weight: 500; color: var(--text2); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 10px; }
-  .overall-bar-track { height: 4px; background: var(--border2); border-radius: 2px; overflow: hidden; }
-  .overall-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
-  .overall-stats { display: flex; justify-content: space-between; margin-top: 6px; }
-  .overall-stats span { font-size: 11px; color: var(--text3); }
+.course-list { flex: 1; overflow-y: auto; padding: 6px; }
+.course-list::-webkit-scrollbar { width: 3px; }
+.course-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-  .video-list { flex: 1; overflow-y: auto; padding: 8px; }
-  .video-list::-webkit-scrollbar { width: 4px; }
-  .video-list::-webkit-scrollbar-track { background: transparent; }
-  .video-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+/* DAY SECTIONS */
+.day-section { margin-bottom: 2px; }
+.day-header {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 9px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: background 0.15s;
+  border: 1px solid transparent;
+}
+.day-header:hover { background: var(--surface2); }
+.day-header.open { background: var(--surface2); border-color: var(--border); }
+.day-toggle { width: 14px; height: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--text3); transition: transform 0.2s; }
+.day-toggle svg { width: 11px; height: 11px; }
+.day-header.open .day-toggle { transform: rotate(90deg); }
+.day-num {
+  width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 600; font-family: var(--font-head);
+  background: var(--surface3); color: var(--text2); border: 1px solid var(--border2);
+}
+.day-section.has-progress .day-num { background: var(--accent-glow); color: var(--accent); border-color: rgba(99,179,237,0.25); }
+.day-section.all-done .day-num { background: var(--green-dim); color: var(--green); border-color: rgba(104,211,145,0.25); }
+.day-info { flex: 1; min-width: 0; }
+.day-title { font-size: 11px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.day-meta { font-size: 10px; color: var(--text3); margin-top: 1px; }
+.day-mini-bar { width: 28px; flex-shrink: 0; }
+.day-mini-track { height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
+.day-mini-fill { height: 100%; background: var(--accent); border-radius: 1px; }
 
-  .vitem {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 10px;
-    border-radius: 10px; cursor: pointer;
-    transition: background 0.15s;
-    border: 1px solid transparent;
-    margin-bottom: 2px;
-  }
-  .vitem:hover { background: var(--surface2); }
-  .vitem.active { background: var(--surface2); border-color: var(--accent-dim2); }
-  .vitem-num {
-    width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 500;
-    background: var(--bg); color: var(--text2);
-    border: 1px solid var(--border2);
-  }
-  .vitem.completed .vitem-num { background: var(--accent-dim); color: var(--accent); border-color: rgba(62,207,142,0.3); }
-  .vitem.active .vitem-num { background: var(--accent); color: #0f1117; border-color: transparent; }
-  .vitem-info { flex: 1; min-width: 0; }
-  .vitem-title { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .vitem.active .vitem-title { color: var(--accent); }
-  .vitem-sub { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
-  .vitem-pct { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
-  .vitem-mini-bar { flex: 1; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
-  .vitem-mini-fill { height: 100%; background: var(--accent); border-radius: 1px; }
-  .vitem-check { font-size: 14px; color: var(--accent); flex-shrink: 0; }
+/* FILE LIST */
+.file-list { padding: 2px 0 3px 18px; display: none; }
+.day-header.open + .file-list { display: block; }
+.file-item {
+  display: flex; align-items: center; gap: 7px;
+  padding: 6px 9px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: background 0.12s;
+  border: 1px solid transparent; margin-bottom: 1px;
+}
+.file-item:hover { background: var(--surface3); }
+.file-item.active { background: var(--surface3); border-color: var(--border2); }
+.file-icon {
+  width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; font-weight: 700;
+}
+.fi-video { background: rgba(99,179,237,0.15); color: var(--accent); }
+.fi-pdf   { background: rgba(252,129,129,0.12); color: var(--red); }
+.fi-doc   { background: rgba(99,179,237,0.1);   color: #90cdf4; }
+.fi-xls   { background: var(--green-dim);        color: var(--green); }
+.fi-ppt   { background: rgba(246,173,85,0.12);   color: #f6ad55; }
+.fi-img   { background: rgba(246,224,94,0.1);    color: var(--yellow); }
+.fi-zip   { background: rgba(159,122,234,0.12);  color: #b794f4; }
+.fi-txt   { background: var(--surface3);         color: var(--text2); }
+.fi-other { background: var(--surface3);         color: var(--text3); }
+.file-name { flex: 1; font-size: 11px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-item.active .file-name { color: var(--text); }
+.file-done { width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; }
+.file-done.checked { background: var(--green); border-color: var(--green); }
+.file-done svg { width: 7px; height: 7px; fill: var(--bg); display: none; }
+.file-done.checked svg { display: block; }
 
-  /* PLAYER */
-  .player-area {
-    flex: 1; display: flex; flex-direction: column;
-    overflow: hidden; background: var(--bg);
-  }
-  .video-container {
-    flex: 1; display: flex; align-items: center; justify-content: center;
-    background: #000; position: relative;
-  }
-  .video-container iframe { width: 100%; height: 100%; border: none; display: block; }
-  .no-video-msg {
-    display: flex; flex-direction: column; align-items: center; gap: 16px;
-    color: var(--text3);
-  }
-  .no-video-msg svg { width: 52px; height: 52px; opacity: 0.3; }
-  .no-video-msg p { font-size: 14px; }
+/* ── MAIN ── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.topbar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 18px; background: var(--surface);
+  border-bottom: 1px solid var(--border); flex-shrink: 0; min-height: 52px;
+}
+.topbar-info { flex: 1; min-width: 0; }
+.topbar-day { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px; }
+.topbar-file { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topbar-actions { display: flex; gap: 7px; flex-shrink: 0; }
+.tbtn {
+  padding: 5px 11px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 500;
+  cursor: pointer; font-family: var(--font-body); border: 1px solid var(--border2);
+  background: var(--surface2); color: var(--text2); transition: all 0.15s;
+}
+.tbtn:hover { border-color: var(--accent); color: var(--accent); }
 
-  .player-footer {
-    background: var(--surface); border-top: 1px solid var(--border);
-    padding: 14px 20px; flex-shrink: 0;
-  }
-  .now-playing-label { font-size: 11px; color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 4px; }
-  .now-playing-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .progress-row { display: flex; align-items: center; gap: 12px; }
-  .progress-track {
-    flex: 1; height: 6px; background: var(--border2);
-    border-radius: 3px; overflow: hidden; cursor: pointer;
-  }
-  .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.5s ease; pointer-events: none; }
-  .progress-pct { font-size: 12px; font-weight: 500; color: var(--accent); font-family: 'DM Mono', monospace; min-width: 38px; text-align: right; }
-  .nav-btns { display: flex; gap: 8px; margin-top: 12px; }
-  .nav-btn {
-    background: var(--surface2); border: 1px solid var(--border2);
-    color: var(--text2); border-radius: 8px; padding: 7px 14px;
-    font-size: 13px; font-weight: 500; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-  .mark-btn {
-    margin-left: auto;
-    background: var(--accent-dim); border: 1px solid rgba(62,207,142,0.3);
-    color: var(--accent); border-radius: 8px; padding: 7px 14px;
-    font-size: 13px; font-weight: 500; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
-  }
-  .mark-btn:hover { background: var(--accent-dim2); }
-  .mark-btn.done { background: var(--accent); color: #0f1117; border-color: transparent; }
+.content-area { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.viewer { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }
+.viewer video { width: 100%; height: 100%; object-fit: contain; }
+.viewer iframe { width: 100%; height: 100%; border: none; }
+.placeholder {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; color: var(--text3); background: var(--bg); width: 100%; height: 100%;
+}
+.ph-icon { width: 56px; height: 56px; opacity: 0.18; }
+.placeholder p { font-size: 14px; }
+.placeholder small { font-size: 12px; }
+.placeholder a { color: var(--accent); text-decoration: none; }
 
-  .toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
-    background: var(--surface); border: 1px solid var(--border2); color: var(--text);
-    padding: 10px 20px; border-radius: 100px; font-size: 13px; font-weight: 500;
-    transition: transform 0.3s ease; z-index: 999; white-space: nowrap;
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
+.bottom-bar {
+  background: var(--surface); border-top: 1px solid var(--border);
+  padding: 11px 18px; flex-shrink: 0;
+}
+.progress-row { display: flex; align-items: center; gap: 11px; margin-bottom: 9px; }
+.prog-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.3px; width: 70px; }
+.prog-bar-track { flex: 1; height: 5px; background: var(--surface3); border-radius: 3px; overflow: hidden; cursor: pointer; }
+.prog-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 3px; transition: width 0.3s; pointer-events: none; }
+.prog-bar-pct { font-size: 12px; font-weight: 600; color: var(--accent); font-family: var(--font-head); min-width: 34px; text-align: right; }
+.nav-row { display: flex; align-items: center; gap: 7px; }
+.nav-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 13px; border-radius: var(--radius-sm);
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text2); font-size: 11px; font-weight: 500;
+  cursor: pointer; font-family: var(--font-body); transition: all 0.15s;
+}
+.nav-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.nav-btn svg { width: 13px; height: 13px; }
+.mark-btn {
+  margin-left: auto; padding: 6px 14px; border-radius: var(--radius-sm);
+  background: var(--accent-glow); border: 1px solid rgba(99,179,237,0.25);
+  color: var(--accent); font-size: 11px; font-weight: 500;
+  cursor: pointer; font-family: var(--font-body); transition: all 0.15s;
+}
+.mark-btn:hover { background: var(--accent); color: var(--bg); border-color: transparent; }
+.mark-btn.done { background: var(--green); color: var(--bg); border-color: transparent; }
 
-  /* scrollbar */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+/* ── SETUP MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(8,12,20,0.93);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; padding: 20px; backdrop-filter: blur(8px);
+}
+.modal {
+  width: 100%; max-width: 500px;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 18px; overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-header {
+  padding: 24px 24px 18px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--surface2), var(--surface));
+}
+.modal-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.modal-header h1 { font-family: var(--font-head); font-size: 20px; font-weight: 700; letter-spacing: -0.4px; color: var(--text); margin-bottom: 6px; }
+.modal-header p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.modal-body { padding: 20px 24px; }
+.field-group { margin-bottom: 16px; }
+.field-label { font-size: 10px; font-weight: 500; color: var(--text2); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 7px; display: block; }
+.field-input {
+  width: 100%; background: var(--bg); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); padding: 9px 13px; color: var(--text);
+  font-family: var(--font-body); font-size: 13px; outline: none; transition: border-color 0.2s;
+}
+.field-input:focus { border-color: var(--accent); }
+.field-input::placeholder { color: var(--text3); }
+.hint-box {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 11px 13px; margin-top: 8px;
+}
+.hint-box p { font-size: 12px; color: var(--text2); line-height: 1.7; }
+.hint-box code { font-family: monospace; background: var(--surface3); padding: 1px 5px; border-radius: 4px; color: var(--accent); font-size: 11px; }
+.error-msg { background: rgba(252,129,129,0.08); border: 1px solid rgba(252,129,129,0.2); border-radius: var(--radius-sm); padding: 9px 13px; font-size: 12px; color: var(--red); margin-top: 10px; line-height: 1.5; }
+.modal-footer { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; gap: 9px; }
+.btn-primary {
+  flex: 1; padding: 11px; border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--accent2), #2b6cb0);
+  color: white; border: none; font-family: var(--font-head);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.2s; box-shadow: 0 0 18px rgba(99,179,237,0.2);
+}
+.btn-primary:hover { opacity: 0.9; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-secondary {
+  padding: 11px 18px; border-radius: var(--radius-sm);
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text2); font-family: var(--font-body);
+  font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s;
+}
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+/* LOADING */
+.loading-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 28px; color: var(--text2); font-size: 13px; }
+.spinner { width: 26px; height: 26px; border: 2px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text); padding: 9px 16px; border-radius: 100px;
+  font-size: 12px; font-weight: 500;
+  transform: translateY(50px); opacity: 0;
+  transition: all 0.3s ease; z-index: 200;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.green { border-color: rgba(104,211,145,0.3); color: var(--green); }
+
+.empty-msg { padding: 20px; text-align: center; color: var(--text3); font-size: 12px; line-height: 1.6; }
 </style>
 </head>
 <body>
 
-<!-- SETUP SCREEN -->
-<div id="setup-screen">
-  <div class="setup-box">
-    <div class="logo">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+<!-- APP -->
+<div class="app" id="app" style="display:none">
+  <div class="sidebar">
+    <div class="sidebar-top">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div>
+          <div class="brand-name">Snowflake Training</div>
+          <div class="brand-sub">Vishal Kaushal Bootcamp 2026</div>
+        </div>
       </div>
-      <span class="logo-text">Training Portal</span>
+      <div class="overall-box">
+        <div class="op-top">
+          <span class="op-label">Overall Progress</span>
+          <span class="op-pct" id="overall-pct">0%</span>
+        </div>
+        <div class="prog-track"><div class="prog-fill" id="overall-bar" style="width:0%"></div></div>
+        <div class="op-stats">
+          <div class="op-stat"><span id="stat-done">0</span> done</div>
+          <div class="op-stat"><span id="stat-total">0</span> files</div>
+          <div class="op-stat"><span id="stat-days">0</span> sections</div>
+        </div>
+      </div>
     </div>
-    <h1>Set up your course</h1>
-    <p>Add your training videos from Google Drive. Paste each video's shareable link and give it a title.</p>
-
-    <div class="field-label">Course name</div>
-    <div class="field-row" style="margin-bottom:1.5rem">
-      <input type="text" id="course-name" placeholder="e.g. Onboarding Training 2025" style="font-family:'DM Sans',sans-serif">
+    <div class="course-list" id="course-list">
+      <div class="loading-wrap"><div class="spinner"></div><span>Loading course...</span></div>
     </div>
+  </div>
 
-    <div class="field-label">Add videos</div>
-    <div class="field-row">
-      <input type="text" id="video-title-input" placeholder="Video title">
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-info">
+        <div class="topbar-day" id="topbar-day">Select a file to begin</div>
+        <div class="topbar-file" id="topbar-file">—</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="tbtn" onclick="openModal(true)">⚙ Settings</button>
+        <button class="tbtn" onclick="resetAll()">↺ Reset</button>
+      </div>
     </div>
-    <div class="field-row">
-      <input type="text" id="video-url-input" placeholder="Google Drive share link (drive.google.com/...)">
-      <button class="btn-add" onclick="addVideo()">+ Add</button>
+    <div class="content-area">
+      <div class="viewer" id="viewer">
+        <div class="placeholder">
+          <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <path d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+          </svg>
+          <p>Select a file from the sidebar</p>
+          <small>Videos play inline · PDFs open inline · Other files download</small>
+        </div>
+      </div>
     </div>
-
-    <div class="video-entries" id="video-entries"></div>
-
-    <button class="btn-launch" id="launch-btn" onclick="launchPlayer()" disabled>Launch Player →</button>
-
-    <p class="hint">
-      To get a Google Drive link: right-click the video → Share → Copy link. Make sure sharing is set to "Anyone with the link".<br><br>
-      Your progress is saved automatically in your browser — it will be there next time you open this page.
-    </p>
+    <div class="bottom-bar">
+      <div class="progress-row">
+        <span class="prog-label">Progress</span>
+        <div class="prog-bar-track" id="prog-track">
+          <div class="prog-bar-fill" id="prog-fill" style="width:0%"></div>
+        </div>
+        <span class="prog-bar-pct" id="prog-pct">0%</span>
+      </div>
+      <div class="nav-row">
+        <button class="nav-btn" id="btn-prev" onclick="navigate(-1)" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>Prev
+        </button>
+        <button class="nav-btn" id="btn-next" onclick="navigate(1)" disabled>
+          Next<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <button class="mark-btn" id="mark-btn" onclick="toggleComplete()">✓ Mark Complete</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- PLAYER SCREEN -->
-<div id="player-screen">
-  <div class="topbar">
-    <div class="topbar-logo">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24" fill="#0f1117"><path d="M8 5v14l11-7z"/></svg>
+<!-- SETUP MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-brand">
+        <div class="brand-icon" style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#4299e1,#2b6cb0);display:flex;align-items:center;justify-content:center">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div>
+          <div style="font-family:var(--font-head);font-size:13px;font-weight:700;color:var(--text)">Training Portal</div>
+          <div style="font-size:10px;color:var(--text3)">Google Drive powered</div>
+        </div>
       </div>
+      <h1>Connect Google Drive</h1>
+      <p>Paste your Google Drive API key and the shared folder link. The portal will automatically read all your DAY folders and files.</p>
     </div>
-    <span class="topbar-title">Training Portal</span>
-    <div class="topbar-sep"></div>
-    <span class="topbar-course" id="topbar-course-name"></span>
-    <div class="topbar-right">
-      <div class="overall-badge">
-        <span id="topbar-pct">0% complete</span>
+    <div class="modal-body">
+      <div class="field-group">
+        <label class="field-label">Google Drive API Key</label>
+        <input class="field-input" id="api-key" placeholder="AIza..." />
+        <div class="hint-box">
+          <p>Get a free API key in 2 minutes:<br>
+          1. Go to <code>console.cloud.google.com</code><br>
+          2. Create project → Enable <code>Google Drive API</code><br>
+          3. Credentials → Create → API Key → Copy it here</p>
+        </div>
       </div>
-      <button class="btn-reset" onclick="resetProgress()">Reset progress</button>
-      <button class="btn-reset" onclick="goToSetup()">Edit videos</button>
+      <div class="field-group">
+        <label class="field-label">Google Drive Folder Link</label>
+        <input class="field-input" id="folder-url" placeholder="https://drive.google.com/drive/folders/..." />
+      </div>
+      <div id="modal-error" class="error-msg" style="display:none"></div>
     </div>
-  </div>
-
-  <div class="main-layout">
-    <div class="sidebar">
-      <div class="sidebar-header">
-        <h3>Course progress</h3>
-        <div class="overall-bar-track">
-          <div class="overall-bar-fill" id="overall-bar" style="width:0%"></div>
-        </div>
-        <div class="overall-stats">
-          <span id="stat-watched">0 watched</span>
-          <span id="stat-total">0 videos</span>
-        </div>
-      </div>
-      <div class="video-list" id="video-list"></div>
-    </div>
-
-    <div class="player-area">
-      <div class="video-container" id="video-container">
-        <div class="no-video-msg" id="no-video-msg">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-          <p>Select a video to start watching</p>
-        </div>
-        <iframe id="video-iframe" style="display:none" allowfullscreen allow="autoplay"></iframe>
-      </div>
-
-      <div class="player-footer">
-        <div class="now-playing-label">Now playing</div>
-        <div class="now-playing-title" id="now-playing-title">—</div>
-        <div class="progress-row">
-          <div class="progress-track" id="progress-track">
-            <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-          </div>
-          <div class="progress-pct" id="progress-pct">0%</div>
-        </div>
-        <div class="nav-btns">
-          <button class="nav-btn" id="btn-prev" onclick="prevVideo()">← Previous</button>
-          <button class="nav-btn" id="btn-next" onclick="nextVideo()">Next →</button>
-          <button class="mark-btn" id="mark-btn" onclick="toggleComplete()">Mark as complete</button>
-        </div>
-      </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" id="skip-btn" onclick="closeModal()" style="display:none">Cancel</button>
+      <button class="btn-primary" id="load-btn" onclick="loadDrive()">Load Course →</button>
     </div>
   </div>
 </div>
@@ -346,271 +388,336 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const STORAGE_KEY = 'training_portal_v1';
-  let state = {
-    courseName: '',
-    videos: [],
-    progress: {},
-    currentIndex: -1
-  };
+// ── CONFIG ─────────────────────────────────────────────────────
+const FOLDER_ID = '1InECd8xPO2NjaIWJv_N_Ex_vYxwCyfpb';
+const STORAGE_KEY = 'sf_training_v1';
 
-  function loadState() {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        state = { ...state, ...parsed };
-        return true;
-      }
-    } catch(e) {}
-    return false;
+// ── STATE ──────────────────────────────────────────────────────
+let S = {
+  apiKey: '',
+  sections: [],   // [{id, name, files:[{id,name,mimeType,type}]}]
+  progress: {},   // {fileId: {pct, completed}}
+  currentId: null
+};
+
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }
+function loadState() {
+  try { const d = localStorage.getItem(STORAGE_KEY); if(d){ S={...S,...JSON.parse(d)}; return true; } } catch(e){}
+  return false;
+}
+
+// ── FILE TYPE ──────────────────────────────────────────────────
+function getType(mime, name) {
+  if (!mime) mime = '';
+  if (mime.includes('video') || /\.(mp4|webm|mov|mkv|ogg)$/i.test(name)) return 'video';
+  if (mime === 'application/pdf' || /\.pdf$/i.test(name)) return 'pdf';
+  if (mime.includes('spreadsheet') || /\.(xls|xlsx|csv)$/i.test(name)) return 'xls';
+  if (mime.includes('presentation') || /\.(ppt|pptx)$/i.test(name)) return 'ppt';
+  if (mime.includes('document') || mime.includes('word') || /\.(doc|docx)$/i.test(name)) return 'doc';
+  if (mime.includes('image') || /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(name)) return 'img';
+  if (mime.includes('zip') || mime.includes('archive') || /\.(zip|rar|7z|tar|gz)$/i.test(name)) return 'zip';
+  if (mime.includes('text') || /\.txt$/i.test(name)) return 'txt';
+  return 'other';
+}
+function iconLabel(t) {
+  return {video:'▶',pdf:'PDF',xls:'XLS',ppt:'PPT',doc:'DOC',img:'IMG',zip:'ZIP',txt:'TXT',other:'•'}[t]||'•';
+}
+
+// ── GOOGLE DRIVE API ───────────────────────────────────────────
+async function driveList(parentId) {
+  const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`'${parentId}' in parents and trashed=false`)}&fields=files(id,name,mimeType)&orderBy=name&pageSize=200&key=${S.apiKey}`;
+  const r = await fetch(url);
+  if (!r.ok) {
+    const e = await r.json().catch(()=>({}));
+    throw new Error(e.error?.message || `Drive API error: ${r.status}`);
+  }
+  return (await r.json()).files || [];
+}
+
+async function loadDrive() {
+  const key = document.getElementById('api-key').value.trim();
+  const folderUrl = document.getElementById('folder-url').value.trim();
+  const errEl = document.getElementById('modal-error');
+  errEl.style.display = 'none';
+
+  if (!key) { errEl.textContent = 'Please enter your Google Drive API key.'; errEl.style.display = 'block'; return; }
+
+  // Extract folder ID from URL or use directly
+  let folderId = FOLDER_ID;
+  if (folderUrl) {
+    const m = folderUrl.match(/folders\/([a-zA-Z0-9_-]+)/);
+    if (m) folderId = m[1];
   }
 
-  function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  const btn = document.getElementById('load-btn');
+  btn.textContent = 'Loading...'; btn.disabled = true;
+
+  try {
+    S.apiKey = key;
+
+    // Get all items in root folder
+    const items = await driveList(folderId);
+
+    // Separate folders and files
+    const folders = items
+      .filter(i => i.mimeType === 'application/vnd.google-apps.folder')
+      .sort((a,b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
+
+    if (!folders.length) throw new Error('No sub-folders found. Make sure the folder contains DAY folders and is shared publicly.');
+
+    // Load files from each folder (parallel)
+    const sections = await Promise.all(folders.map(async folder => {
+      const files = await driveList(folder.id);
+      return {
+        id: folder.id,
+        name: folder.name,
+        files: files
+          .filter(f => f.mimeType !== 'application/vnd.google-apps.folder')
+          .map(f => ({ id: f.id, name: f.name, mimeType: f.mimeType, type: getType(f.mimeType, f.name) }))
+          .sort((a,b) => a.name.localeCompare(b.name, undefined, {numeric: true}))
+      };
+    }));
+
+    S.sections = sections.filter(s => s.files.length > 0);
+    save();
+    closeModal();
+    renderApp();
+    showToast(`✓ Loaded ${S.sections.length} sections!`, true);
+  } catch(e) {
+    errEl.textContent = e.message;
+    errEl.style.display = 'block';
   }
 
-  function getDriveEmbedUrl(url) {
-    // Handle various Google Drive URL formats
-    let fileId = null;
-    const patterns = [
-      /\/file\/d\/([a-zA-Z0-9_-]+)/,
-      /id=([a-zA-Z0-9_-]+)/,
-      /\/d\/([a-zA-Z0-9_-]+)/
-    ];
-    for (const p of patterns) {
-      const m = url.match(p);
-      if (m) { fileId = m[1]; break; }
-    }
-    if (!fileId) return url;
-    return `https://drive.google.com/file/d/${fileId}/preview`;
+  btn.textContent = 'Load Course →'; btn.disabled = false;
+}
+
+// ── MODAL ──────────────────────────────────────────────────────
+function openModal(cancellable = true) {
+  document.getElementById('modal').style.display = 'flex';
+  document.getElementById('skip-btn').style.display = cancellable ? 'block' : 'none';
+  document.getElementById('api-key').value = S.apiKey || '';
+  document.getElementById('folder-url').value = `https://drive.google.com/drive/folders/${FOLDER_ID}`;
+  document.getElementById('modal-error').style.display = 'none';
+}
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+// ── RENDER ─────────────────────────────────────────────────────
+function renderApp() {
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('stat-days').textContent = S.sections.length;
+  renderSidebar();
+  updateOverall();
+  if (S.currentId) {
+    const f = findFile(S.currentId);
+    if (f) openFile(f.si, f.fi, false);
   }
+}
 
-  // ── SETUP ──────────────────────────────────────────────────
-  let tempVideos = [];
+function renderSidebar() {
+  const list = document.getElementById('course-list');
+  if (!S.sections.length) { list.innerHTML = '<div class="empty-msg">No sections found.<br>Check your API key and folder sharing settings.</div>'; return; }
 
-  function addVideo() {
-    const titleEl = document.getElementById('video-title-input');
-    const urlEl = document.getElementById('video-url-input');
-    const title = titleEl.value.trim();
-    const url = urlEl.value.trim();
-    if (!title || !url) { showToast('Please enter both a title and a URL'); return; }
-    tempVideos.push({ id: Date.now().toString(), title, url });
-    titleEl.value = ''; urlEl.value = '';
-    titleEl.focus();
-    renderEntries();
-  }
+  list.innerHTML = S.sections.map((sec, si) => {
+    const done = sec.files.filter(f => (S.progress[f.id]||{}).completed).length;
+    const pct = sec.files.length ? Math.round((done / sec.files.length) * 100) : 0;
+    const allDone = pct === 100 && sec.files.length > 0;
+    const hasProg = pct > 0 && !allDone;
+    const isOpen = sec.files.some(f => f.id === S.currentId);
 
-  document.getElementById('video-url-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') addVideo();
-  });
-  document.getElementById('video-title-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('video-url-input').focus();
-  });
-
-  function removeEntry(id) {
-    tempVideos = tempVideos.filter(v => v.id !== id);
-    renderEntries();
-  }
-
-  function renderEntries() {
-    const container = document.getElementById('video-entries');
-    container.innerHTML = tempVideos.map((v, i) => `
-      <div class="video-entry">
-        <div class="entry-num">${i + 1}</div>
-        <div class="entry-title" title="${v.title}">${v.title}</div>
-        <button class="entry-remove" onclick="removeEntry('${v.id}')" title="Remove">×</button>
-      </div>
-    `).join('');
-    document.getElementById('launch-btn').disabled = tempVideos.length === 0;
-  }
-
-  function launchPlayer() {
-    const name = document.getElementById('course-name').value.trim() || 'My Training Course';
-    state.courseName = name;
-    state.videos = tempVideos;
-    if (state.currentIndex >= state.videos.length) state.currentIndex = -1;
-    saveState();
-    showPlayer();
-  }
-
-  function goToSetup() {
-    tempVideos = [...state.videos];
-    document.getElementById('course-name').value = state.courseName;
-    renderEntries();
-    document.getElementById('setup-screen').style.display = 'flex';
-    document.getElementById('player-screen').style.display = 'none';
-  }
-
-  // ── PLAYER ──────────────────────────────────────────────────
-  function showPlayer() {
-    document.getElementById('setup-screen').style.display = 'none';
-    document.getElementById('player-screen').style.display = 'flex';
-    document.getElementById('topbar-course-name').textContent = state.courseName;
-    renderVideoList();
-    updateOverallProgress();
-    if (state.currentIndex >= 0 && state.currentIndex < state.videos.length) {
-      selectVideo(state.currentIndex, false);
-    }
-  }
-
-  function renderVideoList() {
-    const list = document.getElementById('video-list');
-    list.innerHTML = state.videos.map((v, i) => {
-      const prog = state.progress[v.id] || { pct: 0, completed: false };
-      const pct = Math.round(prog.pct || 0);
-      const isActive = i === state.currentIndex;
-      const isDone = prog.completed;
-      return `
-        <div class="vitem ${isActive ? 'active' : ''} ${isDone ? 'completed' : ''}" onclick="selectVideo(${i}, true)">
-          <div class="vitem-num">${isDone && !isActive ? '✓' : i + 1}</div>
-          <div class="vitem-info">
-            <div class="vitem-title">${v.title}</div>
-            <div class="vitem-sub">
-              <span class="vitem-pct">${pct}%</span>
-              <div class="vitem-mini-bar"><div class="vitem-mini-fill" style="width:${pct}%"></div></div>
-            </div>
-          </div>
+    return `<div class="day-section ${hasProg?'has-progress':''} ${allDone?'all-done':''}" id="sec-${si}">
+      <div class="day-header ${isOpen?'open':''}" onclick="toggleSec(${si})">
+        <div class="day-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="day-num">${allDone ? '✓' : si+1}</div>
+        <div class="day-info">
+          <div class="day-title">${sec.name}</div>
+          <div class="day-meta">${sec.files.length} file${sec.files.length!==1?'s':''} · ${pct}%</div>
         </div>
-      `;
-    }).join('');
+        <div class="day-mini-bar"><div class="day-mini-track"><div class="day-mini-fill" style="width:${pct}%"></div></div></div>
+      </div>
+      <div class="file-list">
+        ${sec.files.map((file, fi) => {
+          const prog = S.progress[file.id] || {};
+          return `<div class="file-item ${file.id===S.currentId?'active':''}" onclick="openFile(${si},${fi},true)">
+            <div class="file-icon fi-${file.type}">${iconLabel(file.type)}</div>
+            <div class="file-name" title="${file.name}">${file.name}</div>
+            <div class="file-done ${prog.completed?'checked':''}"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleSec(si) {
+  const h = document.getElementById(`sec-${si}`).querySelector('.day-header');
+  h.classList.toggle('open');
+}
+
+// ── OPEN FILE ──────────────────────────────────────────────────
+function openFile(si, fi, doSave) {
+  const sec = S.sections[si];
+  const file = sec.files[fi];
+  S.currentId = file.id;
+  if (doSave) save();
+
+  document.getElementById('topbar-day').textContent = sec.name;
+  document.getElementById('topbar-file').textContent = file.name;
+
+  const viewer = document.getElementById('viewer');
+  const directUrl = `https://drive.google.com/uc?export=download&id=${file.id}`;
+  const previewUrl = `https://drive.google.com/file/d/${file.id}/preview`;
+  const embedUrl  = `https://drive.google.com/file/d/${file.id}/preview`;
+
+  if (file.type === 'video') {
+    // Use Drive preview iframe for video (most reliable for Drive-hosted mp4s)
+    viewer.innerHTML = `<iframe src="${previewUrl}" allowfullscreen allow="autoplay"></iframe>`;
+    // Auto-progress: increment every 30s while this file is active
+    startAutoProgress(file.id);
+  } else if (file.type === 'pdf') {
+    viewer.innerHTML = `<iframe src="${previewUrl}"></iframe>`;
+    startAutoProgress(file.id);
+  } else if (file.type === 'img') {
+    const imgSrc = `https://drive.google.com/thumbnail?id=${file.id}&sz=w1200`;
+    viewer.innerHTML = `<div style="background:var(--bg);width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:auto;padding:20px"><img src="${imgSrc}" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px"></div>`;
+  } else if (file.type === 'doc' || file.type === 'xls' || file.type === 'ppt') {
+    // Google Docs/Sheets/Slides can embed via preview
+    viewer.innerHTML = `<iframe src="${embedUrl}"></iframe>`;
+    startAutoProgress(file.id);
+  } else {
+    // TXT, ZIP, other — offer download
+    viewer.innerHTML = `<div class="placeholder">
+      <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      <p>${file.name}</p>
+      <small><a href="${directUrl}" target="_blank">↗ Download file</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="https://drive.google.com/file/d/${file.id}/view" target="_blank">Open in Google Drive</a></small>
+    </div>`;
   }
 
-  function selectVideo(index, saveProgress) {
-    state.currentIndex = index;
-    const video = state.videos[index];
-    const prog = state.progress[video.id] || { pct: 0, completed: false };
+  const prog = S.progress[file.id] || {};
+  updateProgUI(prog.pct || 0, prog.completed);
 
-    document.getElementById('no-video-msg').style.display = 'none';
-    const iframe = document.getElementById('video-iframe');
-    iframe.style.display = 'block';
-    iframe.src = getDriveEmbedUrl(video.url);
+  const flat = allFiles();
+  const idx = flat.findIndex(f => f.id === file.id);
+  document.getElementById('btn-prev').disabled = idx <= 0;
+  document.getElementById('btn-next').disabled = idx >= flat.length - 1;
 
-    document.getElementById('now-playing-title').textContent = video.title;
-    updateProgressUI(prog.pct || 0, prog.completed);
-    renderVideoList();
-    saveState();
+  renderSidebar(); updateOverall();
+  setTimeout(() => {
+    const el = document.querySelector('.file-item.active');
+    if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, 60);
+}
 
-    document.getElementById('btn-prev').disabled = index === 0;
-    document.getElementById('btn-next').disabled = index === state.videos.length - 1;
+// ── AUTO PROGRESS ──────────────────────────────────────────────
+let autoTimer = null;
+function startAutoProgress(fileId) {
+  clearInterval(autoTimer);
+  autoTimer = setInterval(() => {
+    if (S.currentId !== fileId) { clearInterval(autoTimer); return; }
+    const prog = S.progress[fileId] || { pct: 0, completed: false };
+    if (prog.completed || prog.pct >= 95) { clearInterval(autoTimer); return; }
+    const newPct = Math.min(95, (prog.pct || 0) + 1.5);
+    updateFileProg(fileId, newPct, newPct >= 90);
+  }, 30000); // every 30 seconds
+}
 
-    // Scroll active item into view
-    const listEl = document.getElementById('video-list');
-    const activeEl = listEl.querySelectorAll('.vitem')[index];
-    if (activeEl) activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  }
+function updateFileProg(id, pct, completed) {
+  if (!S.progress[id]) S.progress[id] = { pct: 0, completed: false };
+  const p = S.progress[id];
+  if (completed && !p.completed) { p.completed = true; showToast('✓ File complete!', true); }
+  p.pct = Math.max(p.pct || 0, Math.round(pct));
+  save(); updateProgUI(p.pct, p.completed); updateOverall();
+}
 
-  function updateProgressUI(pct, completed) {
-    const p = Math.round(pct);
-    document.getElementById('progress-fill').style.width = p + '%';
-    document.getElementById('progress-pct').textContent = p + '%';
-    const btn = document.getElementById('mark-btn');
-    if (completed) {
-      btn.textContent = '✓ Completed';
-      btn.classList.add('done');
-    } else {
-      btn.textContent = 'Mark as complete';
-      btn.classList.remove('done');
+function updateProgUI(pct, completed) {
+  const p = Math.round(pct);
+  document.getElementById('prog-fill').style.width = p + '%';
+  document.getElementById('prog-pct').textContent = p + '%';
+  const btn = document.getElementById('mark-btn');
+  if (completed) { btn.textContent = '✓ Completed'; btn.classList.add('done'); }
+  else { btn.textContent = '✓ Mark Complete'; btn.classList.remove('done'); }
+}
+
+function updateOverall() {
+  const all = allFiles();
+  if (!all.length) return;
+  const done = all.filter(f => (S.progress[f.id]||{}).completed).length;
+  const avg = all.reduce((s,f) => s + ((S.progress[f.id]||{}).pct||0), 0) / all.length;
+  const pct = Math.round(avg);
+  document.getElementById('overall-pct').textContent = pct + '%';
+  document.getElementById('overall-bar').style.width = pct + '%';
+  document.getElementById('stat-done').textContent = done;
+  document.getElementById('stat-total').textContent = all.length;
+}
+
+function toggleComplete() {
+  if (!S.currentId) return;
+  if (!S.progress[S.currentId]) S.progress[S.currentId] = { pct: 0, completed: false };
+  const p = S.progress[S.currentId];
+  p.completed = !p.completed;
+  if (p.completed) p.pct = 100;
+  save(); updateProgUI(p.pct, p.completed); updateOverall(); renderSidebar();
+  showToast(p.completed ? '✓ Marked complete!' : 'Marked incomplete', p.completed);
+}
+
+function navigate(dir) {
+  const flat = allFiles();
+  const idx = flat.findIndex(f => f.id === S.currentId);
+  const next = idx + dir;
+  if (next < 0 || next >= flat.length) return;
+  const target = flat[next];
+  for (let si = 0; si < S.sections.length; si++) {
+    const fi = S.sections[si].files.findIndex(f => f.id === target.id);
+    if (fi >= 0) {
+      const h = document.getElementById(`sec-${si}`).querySelector('.day-header');
+      if (!h.classList.contains('open')) h.classList.add('open');
+      openFile(si, fi, true); return;
     }
   }
+}
 
-  function updateOverallProgress() {
-    const total = state.videos.length;
-    if (total === 0) return;
-    const completed = state.videos.filter(v => (state.progress[v.id] || {}).completed).length;
-    const avgPct = state.videos.reduce((sum, v) => sum + ((state.progress[v.id] || {}).pct || 0), 0) / total;
-    const overallPct = Math.round(avgPct);
-    document.getElementById('overall-bar').style.width = overallPct + '%';
-    document.getElementById('topbar-pct').textContent = overallPct + '% complete';
-    document.getElementById('stat-watched').textContent = `${completed} completed`;
-    document.getElementById('stat-total').textContent = `${total} videos`;
+// Manual progress bar click
+document.getElementById('prog-track').addEventListener('click', function(e) {
+  if (!S.currentId) return;
+  const rect = this.getBoundingClientRect();
+  const pct = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+  updateFileProg(S.currentId, pct, pct >= 90);
+  renderSidebar();
+});
+
+function allFiles() { return S.sections.flatMap(s => s.files); }
+function findFile(id) {
+  for (let si = 0; si < S.sections.length; si++) {
+    const fi = S.sections[si].files.findIndex(f => f.id === id);
+    if (fi >= 0) return { si, fi };
   }
+  return null;
+}
 
-  function toggleComplete() {
-    if (state.currentIndex < 0) return;
-    const video = state.videos[state.currentIndex];
-    if (!state.progress[video.id]) state.progress[video.id] = { pct: 0, completed: false };
-    const prog = state.progress[video.id];
-    prog.completed = !prog.completed;
-    if (prog.completed) prog.pct = 100;
-    saveState();
-    updateProgressUI(prog.pct, prog.completed);
-    updateOverallProgress();
-    renderVideoList();
-    showToast(prog.completed ? '✓ Marked as complete!' : 'Marked as incomplete');
+function resetAll() {
+  if (!confirm('Reset all progress? This cannot be undone.')) return;
+  S.progress = {}; S.currentId = null; save();
+  document.getElementById('viewer').innerHTML = `<div class="placeholder"><svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg><p>Select a file from the sidebar</p><small>Videos play inline · PDFs open inline · Other files download</small></div>`;
+  document.getElementById('topbar-day').textContent = 'Select a file to begin';
+  document.getElementById('topbar-file').textContent = '—';
+  updateProgUI(0, false); renderSidebar(); updateOverall();
+  showToast('Progress reset');
+}
+
+function showToast(msg, green = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show' + (green ? ' green' : '');
+  clearTimeout(t._t); t._t = setTimeout(() => t.className = 'toast', 2800);
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  const has = loadState();
+  if (has && S.apiKey && S.sections?.length) {
+    renderApp(); document.getElementById('modal').style.display = 'none';
+  } else {
+    openModal(false);
   }
-
-  function prevVideo() {
-    if (state.currentIndex > 0) selectVideo(state.currentIndex - 1, true);
-  }
-
-  function nextVideo() {
-    if (state.currentIndex < state.videos.length - 1) selectVideo(state.currentIndex + 1, true);
-  }
-
-  // Manual progress slider via track click
-  document.getElementById('progress-track').addEventListener('click', function(e) {
-    if (state.currentIndex < 0) return;
-    const rect = this.getBoundingClientRect();
-    const pct = Math.round(((e.clientX - rect.left) / rect.width) * 100);
-    const video = state.videos[state.currentIndex];
-    if (!state.progress[video.id]) state.progress[video.id] = { pct: 0, completed: false };
-    state.progress[video.id].pct = pct;
-    if (pct >= 90) state.progress[video.id].completed = true;
-    saveState();
-    updateProgressUI(state.progress[video.id].pct, state.progress[video.id].completed);
-    updateOverallProgress();
-    renderVideoList();
-  });
-
-  // Auto-save progress every 30s (increment slowly to simulate watching)
-  setInterval(() => {
-    if (state.currentIndex < 0) return;
-    const iframe = document.getElementById('video-iframe');
-    if (iframe.style.display === 'none') return;
-    const video = state.videos[state.currentIndex];
-    if (!state.progress[video.id]) state.progress[video.id] = { pct: 0, completed: false };
-    const prog = state.progress[video.id];
-    if (!prog.completed && prog.pct < 95) {
-      prog.pct = Math.min(95, (prog.pct || 0) + 2);
-      saveState();
-      updateProgressUI(prog.pct, prog.completed);
-      updateOverallProgress();
-      renderVideoList();
-    }
-  }, 30000);
-
-  function resetProgress() {
-    if (!confirm('Reset all progress? This cannot be undone.')) return;
-    state.progress = {};
-    state.currentIndex = -1;
-    document.getElementById('video-iframe').style.display = 'none';
-    document.getElementById('no-video-msg').style.display = 'flex';
-    document.getElementById('now-playing-title').textContent = '—';
-    updateProgressUI(0, false);
-    saveState();
-    renderVideoList();
-    updateOverallProgress();
-    showToast('Progress reset');
-  }
-
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
-  }
-
-  // ── INIT ──────────────────────────────────────────────────
-  window.addEventListener('load', () => {
-    const hasSaved = loadState();
-    if (hasSaved && state.videos && state.videos.length > 0) {
-      tempVideos = [...state.videos];
-      showPlayer();
-    } else {
-      document.getElementById('setup-screen').style.display = 'flex';
-    }
-  });
+});
 </script>
 </body>
 </html>
