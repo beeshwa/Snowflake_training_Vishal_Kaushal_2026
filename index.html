@@ -554,42 +554,75 @@ function toggleSec(si) {
 }
 
 // ── OPEN FILE ──────────────────────────────────────────────────
+let _loadedFileId = null;
+
 function openFile(si, fi, doSave) {
   const sec = S.sections[si];
   const file = sec.files[fi];
+  const isSameFile = _loadedFileId === file.id;
   S.currentId = file.id;
   if (doSave) save();
 
   document.getElementById('topbar-day').textContent = sec.name;
   document.getElementById('topbar-file').textContent = file.name;
 
-  const viewer = document.getElementById('viewer');
-  const directUrl = `https://drive.google.com/uc?export=download&id=${file.id}`;
-  const previewUrl = `https://drive.google.com/file/d/${file.id}/preview`;
-  const embedUrl  = `https://drive.google.com/file/d/${file.id}/preview`;
+  // Only rebuild viewer if switching to a different file
+  if (!isSameFile) {
+    _loadedFileId = file.id;
+    const viewer = document.getElementById('viewer');
+    const directUrl = `https://drive.google.com/uc?export=download&id=${file.id}`;
+    const previewUrl = `https://drive.google.com/file/d/${file.id}/preview`;
+    const prog = S.progress[file.id] || {};
 
-  if (file.type === 'video') {
-    // Use Drive preview iframe for video (most reliable for Drive-hosted mp4s)
-    viewer.innerHTML = `<iframe src="${previewUrl}" allowfullscreen allow="autoplay"></iframe>`;
-    // Auto-progress: increment every 30s while this file is active
-    startAutoProgress(file.id);
-  } else if (file.type === 'pdf') {
-    viewer.innerHTML = `<iframe src="${previewUrl}"></iframe>`;
-    startAutoProgress(file.id);
-  } else if (file.type === 'img') {
-    const imgSrc = `https://drive.google.com/thumbnail?id=${file.id}&sz=w1200`;
-    viewer.innerHTML = `<div style="background:var(--bg);width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:auto;padding:20px"><img src="${imgSrc}" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px"></div>`;
-  } else if (file.type === 'doc' || file.type === 'xls' || file.type === 'ppt') {
-    // Google Docs/Sheets/Slides can embed via preview
-    viewer.innerHTML = `<iframe src="${embedUrl}"></iframe>`;
-    startAutoProgress(file.id);
-  } else {
-    // TXT, ZIP, other — offer download
-    viewer.innerHTML = `<div class="placeholder">
-      <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-      <p>${file.name}</p>
-      <small><a href="${directUrl}" target="_blank">↗ Download file</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="https://drive.google.com/file/d/${file.id}/view" target="_blank">Open in Google Drive</a></small>
-    </div>`;
+    if (file.type === 'video') {
+      // Use native <video> tag so we can restore timestamp on reload
+      const streamUrl = `https://drive.google.com/uc?export=stream&id=${file.id}`;
+      viewer.innerHTML = `<video id="main-video" controls src="${streamUrl}" style="width:100%;height:100%;object-fit:contain" preload="metadata"></video>`;
+      const vid = document.getElementById('main-video');
+
+      // Restore saved position
+      vid.addEventListener('loadedmetadata', () => {
+        if (prog.pct && prog.pct > 1 && prog.pct < 98 && vid.duration) {
+          vid.currentTime = (prog.pct / 100) * vid.duration;
+        }
+      });
+
+      // Save progress every time playback updates
+      vid.addEventListener('timeupdate', () => {
+        if (!vid.duration) return;
+        const pct = Math.round((vid.currentTime / vid.duration) * 100);
+        updateFileProg(file.id, pct, pct >= 90);
+      });
+
+      // Save exact position on pause
+      vid.addEventListener('pause', () => {
+        if (!vid.duration) return;
+        const pct = Math.round((vid.currentTime / vid.duration) * 100);
+        updateFileProg(file.id, pct, pct >= 90);
+      });
+
+      // Fallback to Drive iframe if direct stream is blocked
+      vid.addEventListener('error', () => {
+        viewer.innerHTML = `<iframe src="${previewUrl}" allowfullscreen allow="autoplay" style="width:100%;height:100%;border:none"></iframe>`;
+        startAutoProgress(file.id);
+      });
+
+    } else if (file.type === 'pdf') {
+      viewer.innerHTML = `<iframe src="${previewUrl}" style="width:100%;height:100%;border:none"></iframe>`;
+      startAutoProgress(file.id);
+    } else if (file.type === 'img') {
+      const imgSrc = `https://drive.google.com/thumbnail?id=${file.id}&sz=w1200`;
+      viewer.innerHTML = `<div style="background:var(--bg);width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:auto;padding:20px"><img src="${imgSrc}" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px"></div>`;
+    } else if (file.type === 'doc' || file.type === 'xls' || file.type === 'ppt') {
+      viewer.innerHTML = `<iframe src="${previewUrl}" style="width:100%;height:100%;border:none"></iframe>`;
+      startAutoProgress(file.id);
+    } else {
+      viewer.innerHTML = `<div class="placeholder">
+        <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <p>${file.name}</p>
+        <small><a href="${directUrl}" target="_blank">↗ Download file</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="https://drive.google.com/file/d/${file.id}/view" target="_blank">Open in Google Drive</a></small>
+      </div>`;
+    }
   }
 
   const prog = S.progress[file.id] || {};
