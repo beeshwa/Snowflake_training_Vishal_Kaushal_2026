@@ -455,6 +455,7 @@ async function loadDrive() {
 
   try {
     S.apiKey = key;
+    S.folderId = folderId;
 
     // Get all items in root folder
     const items = await driveList(folderId);
@@ -494,7 +495,8 @@ async function loadDrive() {
 
 // ── SYNC NEW CONTENT (keeps existing progress) ─────────────────
 async function syncContent() {
-  if (!S.apiKey || !S.folderId) { openModal(false); return; }
+  if (!S.apiKey) { openModal(false); return; }
+  if (!S.folderId) S.folderId = FOLDER_ID;
   const btn = document.getElementById('sync-btn');
   btn.textContent = '⟳ Syncing...'; btn.disabled = true;
 
