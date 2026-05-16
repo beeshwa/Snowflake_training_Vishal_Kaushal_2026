@@ -309,6 +309,7 @@ html, body { height: 100%; font-family: var(--font-body); background: var(--bg);
         <div class="topbar-file" id="topbar-file">—</div>
       </div>
       <div class="topbar-actions">
+        <button class="tbtn" id="sync-btn" onclick="syncContent()">⟳ Sync</button>
         <button class="tbtn" onclick="openModal(true)">⚙ Settings</button>
         <button class="tbtn" onclick="resetAll()">↺ Reset</button>
       </div>
@@ -489,6 +490,71 @@ async function loadDrive() {
   }
 
   btn.textContent = 'Load Course →'; btn.disabled = false;
+}
+
+// ── SYNC NEW CONTENT (keeps existing progress) ─────────────────
+async function syncContent() {
+  if (!S.apiKey || !S.folderId) { openModal(false); return; }
+  const btn = document.getElementById('sync-btn');
+  btn.textContent = '⟳ Syncing...'; btn.disabled = true;
+
+  try {
+    const items = await driveList(S.folderId);
+    const folders = items
+      .filter(i => i.mimeType === 'application/vnd.google-apps.folder')
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+    if (!folders.length) throw new Error('No folders found.');
+
+    // Fetch all folder contents in parallel
+    const freshSections = await Promise.all(folders.map(async folder => {
+      const files = await driveList(folder.id);
+      return {
+        id: folder.id,
+        name: folder.name,
+        files: files
+          .filter(f => f.mimeType !== 'application/vnd.google-apps.folder')
+          .map(f => ({ id: f.id, name: f.name, mimeType: f.mimeType, type: getType(f.mimeType, f.name) }))
+          .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
+      };
+    }));
+
+    const filtered = freshSections.filter(s => s.files.length > 0);
+
+    // Count what's new
+    const existingIds = new Set(S.sections.map(s => s.id));
+    const newSections = filtered.filter(s => !existingIds.has(s.id));
+    let newFiles = 0;
+    filtered.forEach(fresh => {
+      const existing = S.sections.find(s => s.id === fresh.id);
+      if (existing) {
+        const existingFileIds = new Set(existing.files.map(f => f.id));
+        const added = fresh.files.filter(f => !existingFileIds.has(f.id));
+        newFiles += added.length;
+        // Merge new files into existing section
+        existing.files = fresh.files;
+      }
+    });
+
+    // Add brand new sections
+    newSections.forEach(s => S.sections.push(s));
+
+    // Re-sort sections naturally
+    S.sections.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+    save();
+    renderApp();
+
+    const msg = newSections.length || newFiles
+      ? `✓ Synced! ${newSections.length} new section${newSections.length !== 1 ? 's' : ''}, ${newFiles} new file${newFiles !== 1 ? 's' : ''}`
+      : '✓ Already up to date!';
+    showToast(msg, true);
+
+  } catch(e) {
+    showToast('Sync failed: ' + e.message);
+  }
+
+  btn.textContent = '⟳ Sync'; btn.disabled = false;
 }
 
 // ── MODAL ──────────────────────────────────────────────────────
